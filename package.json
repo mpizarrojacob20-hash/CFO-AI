@@ -1,0 +1,16 @@
+{
+  "name": "jacob-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Jacob AI — agente de gestion empresarial (contador, CFO, auditor interno, administrador) para PyMEs",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
