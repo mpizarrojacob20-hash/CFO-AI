@@ -135,6 +135,69 @@
     cursor: pointer;
   }
   button#send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  #welcome {
+    flex: 1;
+    padding: 28px 20px 8px;
+    overflow-y: auto;
+  }
+  .welcome-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .welcome-sub {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 24px;
+    max-width: 46ch;
+  }
+  .roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 480px) {
+    .roles { grid-template-columns: 1fr; }
+  }
+  .role {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .role-icon { font-size: 18px; line-height: 1; }
+  .role-name { font-weight: 600; font-size: 13.5px; margin-bottom: 2px; }
+  .role-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+
+  .prompts-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .prompts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .prompt-chip {
+    text-align: left;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .prompt-chip:hover { border-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -147,7 +210,49 @@
     </div>
   </header>
 
-  <div id="messages"></div>
+  <div id="welcome">
+    <div class="welcome-title">Tu equipo de gestión, en un chat</div>
+    <div class="welcome-sub">Contador, CFO, auditor interno y administrador — todo en el mismo lugar. Pregunta lo que sea, o manda tus números para partir.</div>
+    <div class="roles">
+      <div class="role">
+        <span class="role-icon">📋</span>
+        <div>
+          <div class="role-name">Contador</div>
+          <div class="role-desc">Interpreta tus estados financieros y tus gastos</div>
+        </div>
+      </div>
+      <div class="role">
+        <span class="role-icon">📊</span>
+        <div>
+          <div class="role-name">CFO</div>
+          <div class="role-desc">Compara tus márgenes contra tu industria, decide dónde poner la plata</div>
+        </div>
+      </div>
+      <div class="role">
+        <span class="role-icon">🔎</span>
+        <div>
+          <div class="role-name">Auditor interno</div>
+          <div class="role-desc">Detecta focos rojos antes de que te cuesten caro</div>
+        </div>
+      </div>
+      <div class="role">
+        <span class="role-icon">🧭</span>
+        <div>
+          <div class="role-name">Administrador</div>
+          <div class="role-desc">Ordena quién decide qué, para que no dependa todo de ti</div>
+        </div>
+      </div>
+    </div>
+    <div class="prompts-label">Para partir</div>
+    <div class="prompts">
+      <button class="prompt-chip" type="button">Analiza mis números de este mes</button>
+      <button class="prompt-chip" type="button">¿Qué margen es sano en mi rubro?</button>
+      <button class="prompt-chip" type="button">Tengo una duda para clasificar un gasto</button>
+      <button class="prompt-chip" type="button">Ayúdame a ordenar quién decide qué en mi equipo</button>
+    </div>
+  </div>
+
+  <div id="messages" style="display: none;"></div>
 
   <form id="composer">
     <textarea id="input" rows="1" placeholder="Escribe tu mensaje..." autofocus></textarea>
@@ -157,11 +262,24 @@
 
 <script>
   const messagesEl = document.getElementById("messages");
+  const welcomeEl = document.getElementById("welcome");
   const form = document.getElementById("composer");
   const input = document.getElementById("input");
   const sendBtn = document.getElementById("send");
 
   const history = [];
+
+  function dismissWelcome() {
+    welcomeEl.style.display = "none";
+    messagesEl.style.display = "flex";
+  }
+
+  document.querySelectorAll(".prompt-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      input.value = chip.textContent;
+      form.requestSubmit();
+    });
+  });
 
   function addBubble(role, text) {
     const div = document.createElement("div");
@@ -182,6 +300,7 @@
     const text = input.value.trim();
     if (!text) return;
 
+    dismissWelcome();
     addBubble("user", text);
     history.push({ role: "user", content: text });
     input.value = "";
